@@ -48,9 +48,14 @@ impl Scanner {
                     while char_indices.next_if(|&(_pos, ch)| ch.is_numeric()).is_some(){
                         end+=1;
                     }
+                    if end < self.input.len() {
+                        end += 1;
+                    }
+
                     let nstring = self.input[start..end].to_owned();
                     Some(Token::Number(nstring.parse::<u32>().unwrap()))
                 },
+                // lookahead
                 '"' => {
                     let s = char_indices
                     .by_ref()
@@ -82,5 +87,21 @@ impl Iterator for Scanner {
             return Some(self.tokens[cur].clone());
         }
         return None;
+    }
+}
+
+// cargo test -- --show-output
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_1() {
+        let mut scanner = Scanner::new(String::from("1 + 1 = 2"));
+        scanner.scan_tokens();
+        
+        for t in scanner {
+            println!("{:?}",t);
+        }
     }
 }
